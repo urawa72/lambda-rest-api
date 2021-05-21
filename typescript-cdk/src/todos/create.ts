@@ -36,7 +36,10 @@ export const handler = async (event: Event): Promise<HttpResponse> => {
       throw new Error('Checked must be boolean');
     }
     await createTodo(todo);
-    return { statusCode: 200, body: JSON.stringify(data) };
+    return {
+      statusCode: 200,
+      body: JSON.stringify(data),
+    };
   } catch (e) {
     logger.error(e);
     return { statusCode: 500 };
