@@ -10,7 +10,7 @@ interface Event {
 
 interface HttpResponse {
   statusCode: number;
-  body?: string;
+  body: string;
 }
 
 export const handler = async (event: Event): Promise<HttpResponse> => {
@@ -21,7 +21,7 @@ export const handler = async (event: Event): Promise<HttpResponse> => {
   const todo: Todo = {
     id: uuid.v4(),
     text: data.text,
-    checked: data.checked,
+    checked: false,
     createdAt: timestamp,
     updatedAt: timestamp,
   };
@@ -31,17 +31,16 @@ export const handler = async (event: Event): Promise<HttpResponse> => {
       logger.error('Validation Faild');
       throw new Error('Text must be string');
     }
-    if (typeof data.checked !== 'boolean') {
-      logger.error('Validation Faild');
-      throw new Error('Checked must be boolean');
-    }
     await createTodo(todo);
     return {
       statusCode: 200,
-      body: JSON.stringify(data),
+      body: JSON.stringify(todo),
     };
   } catch (e) {
     logger.error(e);
-    return { statusCode: 500 };
+    return {
+      statusCode: 500,
+      body: 'internal server error',
+    };
   }
 };

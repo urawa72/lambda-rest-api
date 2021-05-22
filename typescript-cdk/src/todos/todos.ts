@@ -3,9 +3,9 @@ import { getLogger } from './logger';
 
 const logger = getLogger();
 
-const TODOS_TABLE_NAME = process.env.TODOS_TABLE_NAME ?? '';
+const getTableName = () => process.env.TODOS_TABLE_NAME ?? '';
 
-const dynamoDb = new DynamoDB.DocumentClient({
+export const dynamoDb = new DynamoDB.DocumentClient({
   service: new DynamoDB({
     apiVersion: '2012-10-08',
     region: 'ap-northeast-1',
@@ -22,7 +22,7 @@ export interface Todo {
 
 export const createTodo = async (todo: Todo): Promise<void> => {
   const params: DynamoDB.DocumentClient.PutItemInput = {
-    TableName: TODOS_TABLE_NAME,
+    TableName: getTableName(),
     Item: todo,
   };
 
