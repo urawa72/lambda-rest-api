@@ -1,16 +1,9 @@
-import * as DynamoDB from 'aws-sdk/clients/dynamodb';
+import * as AWS from 'aws-sdk';
 import { getLogger } from './logger';
 
 const logger = getLogger();
-
 const getTableName = () => process.env.TODOS_TABLE_NAME ?? '';
-
-export const dynamoDb = new DynamoDB.DocumentClient({
-  service: new DynamoDB({
-    apiVersion: '2012-10-08',
-    region: 'ap-northeast-1',
-  }),
-});
+const dynamoDb = new AWS.DynamoDB.DocumentClient();
 
 export interface Todo {
   id: string;
@@ -20,8 +13,23 @@ export interface Todo {
   updatedAt: number;
 }
 
+export const getTodo = async (todoId: string): Promise<Todo | null> => {
+  const params: AWS.DynamoDB.DocumentClient.GetItemInput = {
+    TableName: getTableName(),
+    Key: { id: todoId },
+  };
+
+  try {
+    const res = await dynamoDb.get(params).promise();
+    return (res.Item as Todo) ?? null;
+  } catch (e) {
+    logger.error('DynamoDB error');
+    throw e;
+  }
+};
+
 export const createTodo = async (todo: Todo): Promise<void> => {
-  const params: DynamoDB.DocumentClient.PutItemInput = {
+  const params: AWS.DynamoDB.DocumentClient.PutItemInput = {
     TableName: getTableName(),
     Item: todo,
   };
